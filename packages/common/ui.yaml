@@ -1,0 +1,1964 @@
+# ============================================
+# Shared UI Configuration (LVGL)
+# ============================================
+
+
+
+substitutions:
+  # Icons for the main page buttons
+  icon_main_1: "\U000F0335"  # mdi:lightbulb
+  icon_main_1_active: "\U000F06E8" # mdi:lightbulb-on
+  icon_main_2: "\U000F0335"  # mdi:lightbulb
+  icon_main_3: "\U000F0335"  # mdi:lightbulb
+  icon_main_3_active: "\U000F06E8" # mdi:lightbulb-on
+
+  # Services for the main page buttons
+  service_main_1: "light.toggle"
+  service_main_2: "light.toggle"
+  service_main_3: "light.toggle"
+
+# Global Variables
+globals:
+  # Currently selected light entity ID
+  - id: selected_light_entity
+    type: std::string
+    initial_value: '"${light_main_all}"'
+  # Currently selected light friendly name
+  - id: selected_light_name
+    type: std::string
+    initial_value: '"${light_main_all_name}"'
+
+# Text sensors from Home Assistant
+text_sensor:
+  - platform: homeassistant
+    id: ha_temp_hum
+    entity_id: ${sensor_temperature}
+    internal: true
+
+  - platform: homeassistant
+    id: ha_humidity
+    entity_id: ${sensor_humidity}
+    internal: true
+
+# Numeric sensors from Home Assistant
+sensor:
+  - platform: homeassistant
+    id: co2_sensor
+    entity_id: ${sensor_co2}
+    internal: true
+
+# Binary sensors for light states and auto balance
+binary_sensor:
+  - platform: homeassistant
+    id: light_lampadario_state
+    entity_id: ${light_main_1}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update main page button
+          if (x) {
+            lv_obj_add_state(id(btn_lampadario), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_lampadario), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_btn_lampadario), "${icon_main_1_active}");
+          } else {
+            lv_obj_clear_state(id(btn_lampadario), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_lampadario), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_btn_lampadario), "${icon_main_1}");
+          }
+
+  - platform: homeassistant
+    id: light_gruppo_letto_state
+    entity_id: ${light_main_2}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update main page button
+          if (x) {
+            lv_obj_add_state(id(btn_gruppo_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_gruppo_letto), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            // Keep night icon - don't change
+          } else {
+            lv_obj_clear_state(id(btn_gruppo_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_gruppo_letto), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            // Keep night icon - don't change
+          }
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_letto), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_letto), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_letto), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_letto), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_main_2}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_mrc_lights_state
+    entity_id: ${light_main_all}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update main page button
+          if (x) {
+            lv_obj_add_state(id(btn_mrc_lights), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_mrc_lights), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_btn_mrc_lights), "${icon_main_3_active}");
+          } else {
+            lv_obj_clear_state(id(btn_mrc_lights), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_mrc_lights), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_btn_mrc_lights), "${icon_main_3}");
+          }
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_lava), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_lava), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_lava), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_lava), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_lava), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_lava), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_main_all}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_spotlights_state
+    entity_id: ${light_3}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_faretti), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_faretti), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_faretti), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_faretti), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_faretti), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_faretti), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_3}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_billy_state
+    entity_id: ${light_4}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_billy), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_billy), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_billy), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_billy), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_billy), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_billy), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_4}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_lampada_state
+    entity_id: ${light_5}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_armadio), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_armadio), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_armadio), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_armadio), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_armadio), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_armadio), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_5}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_scrivania_state
+    entity_id: ${light_6}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_scrivania), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_scrivania), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_scrivania), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_scrivania), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_scrivania), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_scrivania), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_6}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_monitor_state
+    entity_id: ${light_7}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_monitor), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_monitor), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_monitor), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_monitor), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_monitor), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_monitor), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_7}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  # Lights page 2 binary sensors
+  - platform: homeassistant
+    id: light_8_state
+    entity_id: ${light_8}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_8), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_8), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_8), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_8), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_8), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_8), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_8}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_9_state
+    entity_id: ${light_9}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_9), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_9), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_9), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_9), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_9), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_9), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_9}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_10_state
+    entity_id: ${light_10}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_10), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_10), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_10), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_10), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_10), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_10), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_10}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_11_state
+    entity_id: ${light_11}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_11), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_11), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_11), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_11), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_11), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_11), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_11}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_12_state
+    entity_id: ${light_12}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_12), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_12), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_12), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_12), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_12), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_12), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_12}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_13_state
+    entity_id: ${light_13}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_13), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_13), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_13), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_13), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_13), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_13), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_13}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_14_state
+    entity_id: ${light_14}
+    internal: true
+    on_state:
+      - lambda: |-
+          if (x) {
+            lv_obj_add_state(id(btn_light_14), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_14), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_14), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_14), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_14), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_14), "\U000F0335");
+          }
+          if (id(selected_light_entity) == "${light_14}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+# ============================================
+# Fonts - Material Design Icons
+# ============================================
+
+font:
+  - file: "gfonts://Roboto"
+    id: font_16
+    size: 16
+
+  - file: "gfonts://Roboto"
+    id: font_24
+    size: 24
+
+  - file: "gfonts://Roboto"
+    id: font_32
+    size: 32
+    extras:
+      - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+        glyphs:
+          - "\U000F0238"  # mdi:thermometer
+          - "\U000F0502"  # mdi:movie
+          - "\U000F05A8"  # mdi:power
+          - "\U000F04B9"  # mdi:sofa
+
+  - file: "gfonts://Roboto"
+    id: font_48
+    size: 48
+
+  # Material Design Icons
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_32
+    size: 32
+    glyphs:
+      - "\U000F0335"  # mdi:lightbulb
+      - "\U000F06E8"  # mdi:lightbulb-on
+      - "\U000F0142"  # mdi:cog (settings)
+      - "\U000F004D"  # mdi:arrow-left
+      - "\U000F0054"  # mdi:arrow-right
+      - "\U000F0156"  # mdi:close
+      - "\U000F012C"  # mdi:check
+      - "\U000F0765"  # mdi:palette (color)
+      - "\U000F0238"  # mdi:thermometer (temperature)
+      - "\U000F058C"  # mdi:brightness-6 (brightness)
+      - "\U000F0594"  # mdi:weather-night (night mode)
+
+# ============================================
+# Colors
+# ============================================
+
+color:
+  - id: color_white
+    hex: "FFFFFF"
+  - id: color_dark_bg
+    hex: "2C3E50"
+  - id: color_green
+    hex: "4CAF50"
+  - id: color_cyan
+    hex: "00BCD4"
+  - id: color_yellow
+    hex: "FFEB3B"
+  - id: color_pink
+    hex: "E91E63"
+  - id: color_red
+    hex: "F44336"
+  - id: color_btn_off
+    hex: "2C3E50"
+
+# ============================================
+# LVGL Configuration
+# ============================================
+
+lvgl:
+  displays:
+    - my_display
+  touchscreens:
+    - my_touchscreen
+  color_depth: 16
+  buffer_size: 10%
+  log_level: WARN
+  theme:
+    button:
+      checked:
+        bg_color: 0xFFC107
+
+  style_definitions:
+    - id: style_btn
+      radius: 10
+      border_width: 0
+      bg_color: color_dark_bg
+      text_color: color_white
+
+    - id: style_btn_on
+      bg_color: color_green
+
+  # Top bar is always visible (page 0 equivalent)
+  top_layer:
+    widgets:
+      - label:
+          id: lbl_status
+          x: 240
+          y: 8
+          width: 230
+          height: 40
+          text_align: RIGHT
+          text_font: font_24
+          text_color: color_white
+          bg_opa: TRANSP
+          text: "Loading..."
+
+  pages:
+    # ========== MAIN PAGE (Page 1 equivalent) ==========
+    - id: page_main
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Light button 1 - Lampadario
+        - button:
+            id: btn_lampadario
+            x: 260
+            y: 60
+            width: 95
+            height: 85
+            styles: style_btn
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_btn_lampadario
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "${icon_main_1}"
+            on_short_click:
+              - homeassistant.service:
+                  service: ${service_main_1}
+                  data:
+                    entity_id: ${light_main_1}
+
+        # Light button 2 - Gruppo Letto
+        - button:
+            id: btn_gruppo_letto
+            x: 260
+            y: 155
+            width: 95
+            height: 85
+            styles: style_btn
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_btn_gruppo_letto
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "${icon_main_2}"
+            on_short_click:
+              - homeassistant.service:
+                  service: ${service_main_2}
+                  data:
+                    entity_id: ${light_main_2}
+
+        # Light button 3 - All lights (tall button)
+        - button:
+            id: btn_mrc_lights
+            x: 365
+            y: 60
+            width: 95
+            height: 180
+            styles: style_btn
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_btn_mrc_lights
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "${icon_main_3}"
+            on_short_click:
+              - homeassistant.service:
+                  service: ${service_main_3}
+                  data:
+                    entity_id: ${light_main_all}
+
+        # CO2 Arc meter - full circle
+        - arc:
+            id: arc_co2
+            x: 20
+            y: 50
+            width: 200
+            height: 200
+            min_value: 0
+            max_value: ${co2_max_value}
+            value: 400
+            adjustable: false
+            rotation: 270
+            start_angle: 0
+            end_angle: 360
+            bg_opa: TRANSP
+            border_width: 0
+            arc_width: 12
+            arc_color: 0x333333
+            indicator:
+              arc_color: color_green
+              arc_width: 12
+            knob:
+              bg_opa: TRANSP
+              width: 0
+              height: 0
+
+        # CO2 Value label - centered within arc
+        - label:
+            id: lbl_co2_value
+            x: 20
+            y: 120
+            width: 200
+            height: 60
+            text_align: CENTER
+            text_font: font_48
+            text: "---"
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # CO2 Unit label
+        - label:
+            id: lbl_co2_unit
+            x: 20
+            y: 175
+            width: 200
+            height: 30
+            text_align: CENTER
+            text_font: font_24
+            text: "${co2_label}"
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Settings button - goes to first enabled page
+        - button:
+            id: btn_settings
+            x: 260
+            y: 250
+            width: 200
+            height: 60
+            radius: 30
+            border_width: 0
+            bg_color: color_dark_bg
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: font_24
+                  text: "Imposta"
+                  text_color: color_white
+            on_short_click:
+              - if:
+                  condition:
+                    lambda: 'return strcmp("${enable_scenes_page}", "true") == 0;'
+                  then:
+                    - lvgl.page.show: page_scenes
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return strcmp("${enable_lights_page_1}", "true") == 0;'
+                        then:
+                          - lvgl.page.show: page_lights
+                        else:
+                          - if:
+                              condition:
+                                lambda: 'return strcmp("${enable_lights_page_2}", "true") == 0;'
+                              then:
+                                - lvgl.page.show: page_lights_2
+
+    # ========== SCENES PAGE ==========
+    - id: page_scenes
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Scene 1 (top-left)
+        - button:
+            id: btn_scene_1
+            x: 30
+            y: 40
+            width: 200
+            height: 75
+            radius: 10
+            border_width: 0
+            bg_color: ${scene_1_bg_color}
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: font_32
+                  text_color: ${scene_1_text_color}
+                  text: "${scene_1_label}"
+            on_short_click:
+              - homeassistant.service:
+                  service: script.turn_on
+                  data:
+                    entity_id: ${scene_1}
+
+        # Scene 2 (top-right)
+        - button:
+            id: btn_scene_2
+            x: 250
+            y: 40
+            width: 200
+            height: 75
+            radius: 10
+            border_width: 0
+            bg_color: ${scene_2_bg_color}
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: font_32
+                  text_color: ${scene_2_text_color}
+                  text: "${scene_2_label}"
+            on_short_click:
+              - homeassistant.service:
+                  service: script.turn_on
+                  data:
+                    entity_id: ${scene_2}
+
+        # Scene 3 (bottom-left)
+        - button:
+            id: btn_scene_3
+            x: 30
+            y: 135
+            width: 200
+            height: 75
+            radius: 10
+            border_width: 0
+            bg_color: ${scene_3_bg_color}
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: font_32
+                  text_color: ${scene_3_text_color}
+                  text: "${scene_3_label}"
+            on_short_click:
+              - homeassistant.service:
+                  service: script.turn_on
+                  data:
+                    entity_id: ${scene_3}
+
+        # Scene 4 (bottom-right)
+        - button:
+            id: btn_scene_4
+            x: 250
+            y: 135
+            width: 200
+            height: 75
+            radius: 10
+            border_width: 0
+            bg_color: ${scene_4_bg_color}
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: font_32
+                  text_color: ${scene_4_text_color}
+                  text: "${scene_4_label}"
+            on_short_click:
+              - homeassistant.service:
+                  service: scene.turn_on
+                  data:
+                    entity_id: ${scene_4}
+
+        # Next page button (to lights)
+        - button:
+            x: 350
+            y: 230
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0054"
+            on_short_click:
+              - if:
+                  condition:
+                    lambda: 'return strcmp("${enable_lights_page_1}", "true") == 0;'
+                  then:
+                    - lvgl.page.show: page_lights
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return strcmp("${enable_lights_page_2}", "true") == 0;'
+                        then:
+                          - lvgl.page.show: page_lights_2
+                        else:
+                          - lvgl.page.show: page_main
+
+        # Back button
+        - button:
+            x: 30
+            y: 230
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: 0xD32F2F
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F004D"
+            on_short_click:
+              - lvgl.page.show: page_main
+
+    # ========== LIGHTS SELECTION PAGE 1 ==========
+    - id: page_lights
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Title
+        - label:
+            x: 20
+            y: 10
+            width: 200
+            height: 40
+            text: "${lights_page_1_title}"
+            text_font: font_24
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Row 1: Lava, Letto, Faretti, Billy
+        - button:
+            id: btn_light_lava
+            x: 20
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_lava
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_1}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_1}";
+                  id(selected_light_name) = "${light_1_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 20
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_1_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_letto
+            x: 130
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_letto
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_2}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_2}";
+                  id(selected_light_name) = "${light_2_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 130
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_2_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_faretti
+            x: 240
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_faretti
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_3}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_3}";
+                  id(selected_light_name) = "${light_3_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 240
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_3_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_billy
+            x: 350
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_billy
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_4}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_4}";
+                  id(selected_light_name) = "${light_4_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 350
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_4_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Row 2: Armadio, Scrivania, Monitor
+        - button:
+            id: btn_light_armadio
+            x: 20
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_armadio
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_5}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_5}";
+                  id(selected_light_name) = "${light_5_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 20
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_5_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_scrivania
+            x: 130
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_scrivania
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_6}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_6}";
+                  id(selected_light_name) = "${light_6_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 130
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_6_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_monitor
+            x: 240
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_monitor
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_7}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_7}";
+                  id(selected_light_name) = "${light_7_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 240
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_7_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Next/Back button (context-dependent)
+        - button:
+            x: 350
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: !lambda |-
+                    if (strcmp("${enable_lights_page_2}", "true") == 0) {
+                      return "\U000F0054";  // arrow-right (next)
+                    } else {
+                      return "\U000F004D";  // arrow-left (back)
+                    }
+            on_short_click:
+              - if:
+                  condition:
+                    lambda: 'return strcmp("${enable_lights_page_2}", "true") == 0;'
+                  then:
+                    - lvgl.page.show: page_lights_2
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return strcmp("${enable_scenes_page}", "true") == 0;'
+                        then:
+                          - lvgl.page.show: page_scenes
+                        else:
+                          - lvgl.page.show: page_main
+
+        # Home button
+        - button:
+            x: 350
+            y: 260
+            width: 100
+            height: 50
+            radius: 25
+            border_width: 0
+            bg_color: 0xD32F2F
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0156"
+            on_short_click:
+              - lvgl.page.show: page_main
+
+    # ========== LIGHTS SELECTION PAGE 2 ==========
+    - id: page_lights_2
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Title
+        - label:
+            x: 20
+            y: 10
+            width: 200
+            height: 40
+            text: "${lights_page_2_title}"
+            text_font: font_24
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Row 1: Light 8, 9, 10, 11
+        - button:
+            id: btn_light_8
+            x: 20
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_8
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_8}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_8}";
+                  id(selected_light_name) = "${light_8_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 20
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_8_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_9
+            x: 130
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_9
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_9}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_9}";
+                  id(selected_light_name) = "${light_9_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 130
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_9_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_10
+            x: 240
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_10
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_10}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_10}";
+                  id(selected_light_name) = "${light_10_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 240
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_10_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_11
+            x: 350
+            y: 55
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_11
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_11}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_11}";
+                  id(selected_light_name) = "${light_11_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 350
+            y: 138
+            width: 100
+            height: 25
+            text: "${light_11_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Row 2: Light 12, 13, 14
+        - button:
+            id: btn_light_12
+            x: 20
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_12
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_12}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_12}";
+                  id(selected_light_name) = "${light_12_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 20
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_12_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_13
+            x: 130
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_13
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_13}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_13}";
+                  id(selected_light_name) = "${light_13_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 130
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_13_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        - button:
+            id: btn_light_14
+            x: 240
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            checkable: true
+            widgets:
+              - label:
+                  id: lbl_light_14
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0335"
+            on_short_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: ${light_14}
+            on_long_press:
+              - lambda: |-
+                  id(selected_light_entity) = "${light_14}";
+                  id(selected_light_name) = "${light_14_name}";
+              - lvgl.page.show: page_color
+        - label:
+            x: 240
+            y: 253
+            width: 100
+            height: 25
+            text: "${light_14_name}"
+            text_font: font_16
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # Back button (to lights page 1 or scenes or main)
+        - button:
+            x: 350
+            y: 170
+            width: 100
+            height: 80
+            radius: 10
+            border_width: 0
+            bg_color: color_dark_bg
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F004D"
+            on_short_click:
+              - if:
+                  condition:
+                    lambda: 'return strcmp("${enable_lights_page_1}", "true") == 0;'
+                  then:
+                    - lvgl.page.show: page_lights
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return strcmp("${enable_scenes_page}", "true") == 0;'
+                        then:
+                          - lvgl.page.show: page_scenes
+                        else:
+                          - lvgl.page.show: page_main
+
+        # Home button
+        - button:
+            x: 350
+            y: 260
+            width: 100
+            height: 50
+            radius: 25
+            border_width: 0
+            bg_color: 0xD32F2F
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0156"
+            on_short_click:
+              - lvgl.page.show: page_main
+
+    # ========== COLOR PICKER PAGE ==========
+    - id: page_color
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Light name label
+        - label:
+            id: lbl_color_light_name
+            x: 100
+            y: 15
+            width: 280
+            height: 35
+            text: "Luce"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+
+        # On/Off switch
+        - switch:
+            id: sw_light_power
+            x: 20
+            y: 15
+            width: 60
+            height: 35
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+
+        # Hue slider label
+        - label:
+            x: 20
+            y: 60
+            width: 440
+            height: 30
+            text: "Colore"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+
+        # Rainbow gradient bar - 3 segments for full spectrum
+        # Red to Green
+        - obj:
+            x: 40
+            y: 95
+            width: 134
+            height: 40
+            radius: 0
+            bg_color: 0xFF0000
+            bg_grad_color: 0x00FF00
+            bg_grad_dir: HOR
+            border_width: 0
+            clickable: false
+        # Green to Blue
+        - obj:
+            x: 174
+            y: 95
+            width: 132
+            height: 40
+            radius: 0
+            bg_color: 0x00FF00
+            bg_grad_color: 0x0000FF
+            bg_grad_dir: HOR
+            border_width: 0
+            clickable: false
+        # Blue to Red
+        - obj:
+            x: 306
+            y: 95
+            width: 134
+            height: 40
+            radius: 0
+            bg_color: 0x0000FF
+            bg_grad_color: 0xFF0000
+            bg_grad_dir: HOR
+            border_width: 0
+            clickable: false
+
+        # Hue slider (transparent, sits on top of rainbow bar)
+        - slider:
+            id: slider_hue
+            x: 40
+            y: 95
+            width: 400
+            height: 40
+            min_value: 0
+            max_value: 360
+            value: 0
+            bg_opa: TRANSP
+            indicator:
+              bg_opa: TRANSP
+            knob:
+              bg_color: color_white
+              radius: 20
+              width: 30
+              height: 40
+              border_width: 2
+              border_color: 0x000000
+            on_release:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+                  data_template:
+                    hs_color: !lambda |-
+                      char buf[30];
+                      snprintf(buf, sizeof(buf), "[%d, 100]", (int)lv_slider_get_value(id(slider_hue)));
+                      return std::string(buf);
+
+        # Saturation slider label
+        - label:
+            x: 20
+            y: 145
+            width: 440
+            height: 30
+            text: "Saturazione"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+
+        # Saturation slider
+        - slider:
+            id: slider_saturation
+            x: 40
+            y: 180
+            width: 400
+            height: 35
+            min_value: 0
+            max_value: 100
+            value: 100
+            bg_color: 0x444444
+            indicator:
+              bg_color: 0xFF0000
+            knob:
+              bg_color: color_white
+            on_release:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+                  data_template:
+                    hs_color: !lambda |-
+                      char buf[30];
+                      snprintf(buf, sizeof(buf), "[%d, %d]",
+                        (int)lv_slider_get_value(id(slider_hue)),
+                        (int)lv_slider_get_value(id(slider_saturation)));
+                      return std::string(buf);
+
+        # Brightness slider label
+        - label:
+            x: 20
+            y: 220
+            width: 440
+            height: 25
+            text: "Luce"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+
+        # Brightness slider
+        - slider:
+            id: slider_brightness
+            x: 40
+            y: 250
+            width: 250
+            height: 35
+            min_value: 0
+            max_value: 255
+            value: 255
+            bg_color: 0x222222
+            indicator:
+              bg_color: color_white
+            knob:
+              bg_color: color_yellow
+            on_release:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+                    brightness: !lambda 'return (int)lv_slider_get_value(id(slider_brightness));'
+
+        # Back button (to lights page)
+        - button:
+            x: 340
+            y: 245
+            width: 60
+            height: 45
+            radius: 22
+            border_width: 0
+            bg_color: 0xD32F2F
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F004D"
+            on_short_click:
+              - lvgl.page.show: page_lights
+
+        # Switch to temperature mode
+        - button:
+            x: 410
+            y: 245
+            width: 60
+            height: 45
+            radius: 22
+            border_width: 0
+            bg_color: 0xF57C00
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0238"
+            on_short_click:
+              - lvgl.page.show: page_temp
+
+    # ========== COLOR TEMPERATURE PAGE ==========
+    - id: page_temp
+      scrollbar_mode: "off"
+      width: 480
+      height: 320
+      bg_color: 0x000000
+      widgets:
+        # Light name label
+        - label:
+            id: lbl_temp_light_name
+            x: 100
+            y: 15
+            width: 270
+            height: 35
+            text: "Luce"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+
+        # On/Off switch
+        - switch:
+            id: sw_temp_light_power
+            x: 20
+            y: 15
+            width: 60
+            height: 35
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+
+        # Color temperature slider
+        - label:
+            x: 20
+            y: 80
+            width: 440
+            height: 30
+            text: "Temperatura colore"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+        - slider:
+            id: slider_color_temp
+            x: 40
+            y: 120
+            width: 400
+            height: 40
+            min_value: 153
+            max_value: 500
+            value: 300
+            indicator:
+              bg_color: 0xFFAA55
+            knob:
+              bg_color: color_white
+            on_release:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+                    color_temp: !lambda 'return (int)lv_slider_get_value(id(slider_color_temp));'
+
+        # Brightness slider
+        - label:
+            x: 20
+            y: 180
+            width: 440
+            height: 30
+            text: "Luce"
+            text_font: font_24
+            text_color: color_white
+            text_align: CENTER
+            bg_opa: TRANSP
+        - slider:
+            id: slider_temp_brightness
+            x: 40
+            y: 220
+            width: 400
+            height: 40
+            min_value: 0
+            max_value: 255
+            value: 255
+            indicator:
+              bg_color: color_white
+            knob:
+              bg_color: color_yellow
+            on_release:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: !lambda 'return id(selected_light_entity);'
+                    brightness: !lambda 'return (int)lv_slider_get_value(id(slider_temp_brightness));'
+
+        # Back button (to lights page)
+        - button:
+            x: 20
+            y: 270
+            width: 80
+            height: 45
+            radius: 22
+            border_width: 0
+            bg_color: 0xD32F2F
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F004D"
+            on_short_click:
+              - lvgl.page.show: page_lights
+
+        # Switch to color mode
+        - button:
+            x: 115
+            y: 270
+            width: 80
+            height: 45
+            radius: 22
+            border_width: 0
+            bg_color: 0x689F38
+            widgets:
+              - label:
+                  align: CENTER
+                  text_font: mdi_32
+                  text: "\U000F0765"
+            on_short_click:
+              - lvgl.page.show: page_color
+
+# ============================================
+# Helpers
+# ============================================
+
+button:
+  - platform: template
+    name: "Wake Screen"
+    id: wake_screen
+    icon: "mdi:monitor-shimmer"
+    on_press:
+      - light.turn_on:
+          id: backlight
+          brightness: 100%
+      - lambda: |-
+          lv_disp_trig_activity(NULL);
+
+# ============================================
+# Intervals and Updates
+# ============================================
+
+interval:
+  # Update status bar with temperature and humidity
+  - interval: 5s
+    then:
+      - lvgl.label.update:
+          id: lbl_status
+          text: !lambda |-
+            if (id(ha_temp_hum).has_state() && id(ha_humidity).has_state()) {
+              char buf[32];
+              snprintf(buf, sizeof(buf), "%.0f%% %.1f°C",
+                atof(id(ha_humidity).state.c_str()),
+                atof(id(ha_temp_hum).state.c_str()));
+              return std::string(buf);
+            }
+            return std::string("--% --°C");
+
+  # Update CO2 display
+  - interval: 5s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(co2_sensor).has_state();'
+          then:
+            - lvgl.arc.update:
+                id: arc_co2
+                value: !lambda 'return (int)id(co2_sensor).state;'
+                indicator:
+                  arc_color: !lambda |-
+                    int co2 = (int)id(co2_sensor).state;
+                    if (co2 <= ${co2_threshold_green}) return lv_color_hex(0x4CAF50);      // green
+                    else if (co2 <= ${co2_threshold_cyan}) return lv_color_hex(0x00BCD4); // cyan
+                    else if (co2 <= ${co2_threshold_yellow}) return lv_color_hex(0xFFEB3B); // yellow
+                    else if (co2 <= ${co2_threshold_pink}) return lv_color_hex(0xE91E63); // pink
+                    else return lv_color_hex(0xF44336);                  // red
+            - lvgl.label.update:
+                id: lbl_co2_value
+                text: !lambda |-
+                  char buf[8];
+                  snprintf(buf, sizeof(buf), "%d", (int)id(co2_sensor).state);
+                  return std::string(buf);
+
+  # Update light name labels on color/temp pages
+  - interval: 500ms
+    then:
+      - lvgl.label.update:
+          id: lbl_color_light_name
+          text: !lambda 'return id(selected_light_name);'
+      - lvgl.label.update:
+          id: lbl_temp_light_name
+          text: !lambda 'return id(selected_light_name);'
+
+# Screen timeout - dim after 30s, turn off after 60s
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            - binary_sensor.is_off: light_mrc_lights_state
+            - lvgl.is_idle:
+                timeout: 60s
+          then:
+            - light.turn_off: backlight
+          else:
+            - if:
+                condition:
+                  - binary_sensor.is_off: light_mrc_lights_state
+                  - lvgl.is_idle:
+                      timeout: 30s
+                  - lambda: 'return id(backlight).current_values.get_brightness() > 0.31f;'
+                then:
+                  - light.turn_on:
+                      id: backlight
+                      brightness: 30%
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true

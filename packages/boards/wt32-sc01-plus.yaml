@@ -1,0 +1,85 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  min_version: 2024.6.0
+  name_add_mac_suffix: false
+  project:
+    name: "wt32-sc01-plus.esphome"
+    version: "1.0"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 4MB
+  framework:
+    type: esp-idf
+
+psram:
+  mode: quad
+  speed: 80MHz
+
+# SPI bus for display (octal mode for 8-bit parallel interface)
+spi:
+  id: spi_display
+  type: octal
+  clk_pin: 
+    number: 47
+  data_pins:
+    - number: 9
+    - number: 46
+      ignore_strapping_warning: true
+    - number: 3
+      ignore_strapping_warning: true
+    - number: 8
+    - number: 18
+    - number: 17
+    - number: 16
+    - number: 15
+
+# I2C for touchscreen
+i2c:
+  sda: 6
+  scl: 5
+
+# Backlight control
+output:
+  - platform: ledc
+    pin:
+      number: 45
+      ignore_strapping_warning: true
+    id: backlight_pwm
+
+light:
+  - platform: monochromatic
+    output: backlight_pwm
+    name: "Backlight"
+    id: backlight
+    restore_mode: ALWAYS_ON
+
+# Display - WT32-SC01 Plus via mipi_spi
+display:
+  - platform: mipi_spi
+    model: WT32-SC01-PLUS
+    id: my_display
+    spi_id: spi_display
+    auto_clear_enabled: false
+    rotation: 270
+    reset_pin: 4
+    dc_pin:
+      number: 0
+      ignore_strapping_warning: true
+
+# Touchscreen - FT63x6 (WT32-SC01 Plus uses FT6336)
+touchscreen:
+  - platform: ft63x6
+    id: my_touchscreen
+    interrupt_pin: 7
+    display: my_display
+    transform:
+      swap_xy: true
+      mirror_y: false
+      mirror_x: true
+    on_touch:
+      - light.turn_on:
+          id: backlight
+          brightness: 100%
