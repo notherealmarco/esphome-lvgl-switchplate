@@ -43,6 +43,9 @@ substitutions:
   service_main_2: "light.toggle"
   service_main_3: "light.toggle"
 
+  # Optional: Keep screen awake when entity is ON
+  # keep_awake_entity_id: binary_sensor.motion_sensor
+
   # Lights page 1 - Row 1
   light_1: light.example_4
   light_1_name: "Example 4"

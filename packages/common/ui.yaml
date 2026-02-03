@@ -17,6 +17,10 @@ substitutions:
   service_main_2: "light.toggle"
   service_main_3: "light.toggle"
 
+  # Optional entity to keep screen awake (e.g. motion sensor)
+  # Default to internal dummy sensor if not provided
+  keep_awake_entity_id: "dummy_keep_awake"
+
 # Global Variables
 globals:
   # Currently selected light entity ID
@@ -156,6 +160,24 @@ binary_sensor:
             lv_obj_set_style_bg_color(id(btn_light_faretti), lv_color_hex(0x2C3E50), LV_PART_MAIN);
             lv_label_set_text(id(lbl_light_faretti), "\U000F0335");
           }
+
+  # Dummy sensor for keep awake default
+  - platform: template
+    id: dummy_keep_awake
+    lambda: 'return false;'
+    internal: true
+
+  # Keep Awake Monitor
+  - platform: homeassistant
+    id: ha_keep_awake
+    entity_id: ${keep_awake_entity_id}
+    internal: true
+    on_press:
+      then:
+        - light.turn_on:
+            id: backlight
+            brightness: 100%
+        - lambda: 'lv_disp_trig_activity(NULL);'
           // Update color/temp page switch if this light is selected
           if (id(selected_light_entity) == "${light_3}") {
             if (x) {
@@ -1941,7 +1963,8 @@ interval:
     then:
       - if:
           condition:
-            - binary_sensor.is_off: light_mrc_lights_state
+            # Also reset timer if keep_awake entity is ON
+            - binary_sensor.is_off: ha_keep_awake
             - lvgl.is_idle:
                 timeout: 60s
           then:
