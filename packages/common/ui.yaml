@@ -160,6 +160,16 @@ binary_sensor:
             lv_obj_set_style_bg_color(id(btn_light_faretti), lv_color_hex(0x2C3E50), LV_PART_MAIN);
             lv_label_set_text(id(lbl_light_faretti), "\U000F0335");
           }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_3}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
 
   # Dummy sensor for keep awake default
   - platform: template
@@ -178,16 +188,7 @@ binary_sensor:
             id: backlight
             brightness: 100%
         - lambda: 'lv_disp_trig_activity(NULL);'
-          // Update color/temp page switch if this light is selected
-          if (id(selected_light_entity) == "${light_3}") {
-            if (x) {
-              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
-              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
-            } else {
-              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
-              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
-            }
-          }
+
 
   - platform: homeassistant
     id: light_billy_state
