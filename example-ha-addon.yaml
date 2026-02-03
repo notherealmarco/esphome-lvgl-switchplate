@@ -1,0 +1,110 @@
+substitutions:
+  device_name: wt32-sc01-example
+  friendly_name: WT32-SC01 Example
+  
+  # Page enable/disable (true or false)
+  enable_scenes_page: "true"
+  enable_lights_page_1: "true"
+  enable_lights_page_2: "true"
+  
+  # Page titles
+  lights_page_1_title: "Luci"
+  lights_page_2_title: "Luci 2"
+  
+  # Sensors
+  sensor_temperature: sensor.example_temp
+  sensor_humidity: sensor.example_hum
+  sensor_co2: sensor.example_co2
+  
+  # CO2 display configuration
+  co2_label: "W"
+  co2_max_value: "3300"
+  co2_threshold_green: "500"
+  co2_threshold_cyan: "700"
+  co2_threshold_yellow: "900"
+  co2_threshold_pink: "2000"
+  # Colors: green (<=threshold_green), cyan (<=threshold_cyan), yellow (<=threshold_yellow), pink (<=threshold_pink), red (above)
+
+  # Main page lights
+  light_main_1: light.example_1
+  light_main_1_name: "Example 1"
+  light_main_2: light.example_2
+  light_main_2_name: "Example 2"
+  light_main_all: light.example_3
+  light_main_all_name: "Example 3"
+
+  # Icons
+  icon_main_1: "\U000F0335"
+  icon_main_2: "\U000F0335"
+  icon_main_3: "\U000F0335"
+
+  # Services
+  service_main_1: "light.toggle"
+  service_main_2: "light.toggle"
+  service_main_3: "light.toggle"
+
+  # Lights page 1 - Row 1
+  light_1: light.example_4
+  light_1_name: "Example 4"
+  light_2: light.example_5
+  light_2_name: "Example 5"
+  light_3: light.example_6
+  light_3_name: "Example 6"
+  light_4: light.example_7
+  light_4_name: "Example 7"
+  
+  # Lights page 1 - Row 2
+  light_5: light.example_8
+  light_5_name: "Example 8"
+  light_6: light.example_9
+  light_6_name: "Example 9"
+  light_7: light.example_10
+  light_7_name: "Example 10"
+  
+  # Lights page 2 - Row 1
+  light_8: light.example_11
+  light_8_name: "Example 11"
+  light_9: light.example_12
+  light_9_name: "Example 12"
+  light_10: light.example_13
+  light_10_name: "Example 13"
+  light_11: light.example_14
+  light_11_name: "Example 14"
+  
+  # Lights page 2 - Row 2
+  light_12: light.example_15
+  light_12_name: "Example 15"
+  light_13: light.example_16
+  light_13_name: "Example 16"
+  light_14: light.example_17
+  light_14_name: "Example 17"
+  
+  # Scenes (4 large buttons)
+  scene_1: script.example_1
+  scene_1_label: "\U000F05A8 Scene 1"
+  scene_1_bg_color: "0xFFFFFF"
+  scene_1_text_color: "0x000000"
+  
+  scene_2: script.example_2
+  scene_2_label: "\U000F0238 Scene 2"
+  scene_2_bg_color: "0xFFC107"
+  scene_2_text_color: "0x000000"
+  
+  scene_3: script.example_3
+  scene_3_label: "\U000F04B9 Scene 3"
+  scene_3_bg_color: "0x4CAF50"
+  scene_3_text_color: "0xFFFFFF"
+  
+  scene_4: script.example_4
+  scene_4_label: "\U000F0502 Scene 4"
+  scene_4_bg_color: "0x3F51B5"
+  scene_4_text_color: "0xFFFFFF"
+
+packages:
+  remote_config:
+    url: https://git.marcorealacci.me/marcorealacci/esphome-lvgl-switchplate.git
+    ref: main
+    files:
+      - packages/common/base.yaml
+      - packages/boards/wt32-sc01.yaml  # Change to wt32-sc01-plus.yaml for the Plus model
+      - packages/common/ui.yaml
