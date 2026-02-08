@@ -22,3 +22,7 @@ wifi:
   ap:
     ssid: "${friendly_name} Hotspot"
     password: "fallback_password"
+
+time:
+  - platform: homeassistant
+    id: esptime

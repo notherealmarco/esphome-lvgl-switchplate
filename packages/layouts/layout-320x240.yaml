@@ -21,6 +21,7 @@ substitutions:
   f_large: "font_32"
   f_huge: "font_48"
   f_icon: "mdi_32" # This ID will have different size property
+  f_icon_huge: "mdi_huge"
 
   # Top Bar
   top_h: "30"
@@ -121,3 +122,25 @@ substitutions:
   color_lbl_width: "280"
   color_slider_w: "280"
   color_sat_lbl_y: "95"
+
+  # Info/Screensaver Page Layout (320x240)
+  # Font Sizes
+  info_weather_size: "90"
+  info_clock_size: "56"
+  info_date_size: "24"
+  info_sensor_icon_size: "32"
+  info_sensor_text_size: "26"
+  info_alarm_size: "20"
+  
+  # Top section: Weather icon + Time/Date, vertically centered on screen
+  info_group_x: "30"
+  info_clock_offset: "90"
+  info_weather_y: "25"       # Aligned with time+date block
+  info_clock_y: "30"         # Pushed down for centering
+  info_date_y: "85"          # Reduced gap from clock
+  
+  # Alarm section (between weather/clock and sensor)
+  info_alarm_y: "130"
+  
+  # Sensor section
+  info_sensor_y: "185"

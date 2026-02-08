@@ -21,6 +21,43 @@ substitutions:
   # Default to internal dummy sensor if not provided
   keep_awake_entity_id: "dummy_keep_awake"
 
+  # ==========================
+  # INFO SCREEN (SCREENSAVER)
+  # ==========================
+  screensaver_timeout: "30s"
+  info_cycle_interval: "5s"
+  
+  # Sensor Slot 1
+  info_sensor_1: "sensor.undefined"
+  info_sensor_1_icon: "\U000F05A8" # mdi:information
+  info_sensor_1_unit: ""
+  
+  # Sensor Slot 2
+  info_sensor_2: "sensor.undefined"
+  info_sensor_2_icon: "\U000F05A8"
+  info_sensor_2_unit: ""
+
+  # Sensor Slot 3
+  info_sensor_3: "sensor.undefined"
+  info_sensor_3_icon: "\U000F05A8"
+  info_sensor_3_unit: ""
+
+  # Sensor Slot 4
+  info_sensor_4: "sensor.undefined"
+  info_sensor_4_icon: "\U000F05A8"
+  info_sensor_4_unit: ""
+
+  # Sensor Slot 5
+  info_sensor_5: "sensor.undefined"
+  info_sensor_5_icon: "\U000F05A8"
+  info_sensor_5_unit: ""
+
+  # Weather entity for screensaver
+  weather_entity_id: "weather.home"
+  
+  # Next alarm sensor (optional, hidden if undefined or unavailable)
+  alarm_entity_id: "sensor.undefined"
+
 # Global Variables
 globals:
   # Currently selected light entity ID
@@ -31,6 +68,23 @@ globals:
   - id: selected_light_name
     type: std::string
     initial_value: '"${light_main_all_name}"'
+  
+  # Info Screen Mode (0=Init/Wait, 1-5=Sensor Slot)
+  - id: info_mode
+    type: int
+    initial_value: "1"
+  
+# Script for debounced screensaver wake (filters ghost touches)
+script:
+  - id: screensaver_wake
+    mode: restart
+    then:
+      - delay: 200ms
+      - lvgl.page.show: page_main
+      - light.turn_on:
+          id: backlight
+          brightness: 100%
+      - lambda: 'lv_disp_trig_activity(NULL);'
 
 # Text sensors from Home Assistant
 text_sensor:
@@ -42,6 +96,45 @@ text_sensor:
   - platform: homeassistant
     id: ha_humidity
     entity_id: ${sensor_humidity}
+    internal: true
+
+  # Info Screen Sensors (imported as text)
+  - platform: template
+    id: dummy_info_sensor
+    lambda: 'return {};'
+    internal: true
+
+  - platform: homeassistant
+    id: ha_info_1
+    entity_id: ${info_sensor_1}
+    internal: true
+  - platform: homeassistant
+    id: ha_info_2
+    entity_id: ${info_sensor_2}
+    internal: true
+  - platform: homeassistant
+    id: ha_info_3
+    entity_id: ${info_sensor_3}
+    internal: true
+  - platform: homeassistant
+    id: ha_info_4
+    entity_id: ${info_sensor_4}
+    internal: true
+  - platform: homeassistant
+    id: ha_info_5
+    entity_id: ${info_sensor_5}
+    internal: true
+
+  # Weather state for screensaver
+  - platform: homeassistant
+    id: ha_weather
+    entity_id: ${weather_entity_id}
+    internal: true
+
+  # Next alarm for screensaver (optional)
+  - platform: homeassistant
+    id: ha_alarm
+    entity_id: ${alarm_entity_id}
     internal: true
 
 # Numeric sensors from Home Assistant
@@ -518,6 +611,49 @@ font:
       - "\U000F0238"  # mdi:thermometer (temperature)
       - "\U000F058C"  # mdi:brightness-6 (brightness)
       - "\U000F0594"  # mdi:weather-night (night mode)
+
+  # Weather Icons for Screensaver
+  - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+    id: mdi_weather
+    size: ${info_weather_size}
+    glyphs:
+      # Weather icons (15 states)
+      - "\U000F0599"  # mdi:weather-sunny
+      - "\U000F0594"  # mdi:weather-night (clear-night)
+      - "\U000F0590"  # mdi:weather-cloudy
+      - "\U000F0595"  # mdi:weather-partly-cloudy
+      - "\U000F0597"  # mdi:weather-rainy
+      - "\U000F0596"  # mdi:weather-pouring
+      - "\U000F0598"  # mdi:weather-snowy
+      - "\U000F067F"  # mdi:weather-snowy-rainy
+      - "\U000F0591"  # mdi:weather-fog
+      - "\U000F0592"  # mdi:weather-hail
+      - "\U000F0593"  # mdi:weather-lightning
+      - "\U000F067E"  # mdi:weather-lightning-rainy
+      - "\U000F059D"  # mdi:weather-windy
+      - "\U000F059E"  # mdi:weather-windy-variant
+      - "\U000F0026"  # mdi:alert-circle (exceptional)
+
+  
+  # Dedicated Screensaver Fonts
+  - file: "gfonts://Roboto"
+    id: font_info_clock
+    size: ${info_clock_size}
+    
+  - file: "gfonts://Roboto"
+    id: font_info_date
+    size: ${info_date_size}
+
+  # Alarm display font (icon + text)
+  - file: "gfonts://Roboto"
+    id: font_info_alarm
+    size: ${info_alarm_size}
+    extras:
+      - file: "https://github.com/Templarian/MaterialDesign-Webfont/raw/master/fonts/materialdesignicons-webfont.ttf"
+        glyphs:
+          - "\U000F0020"  # mdi:alarm
+
+
 
 # ============================================
 # Colors
@@ -1888,6 +2024,87 @@ lvgl:
             on_short_click:
               - lvgl.page.show: page_color
 
+    # ========== INFO SCREEN (SCREENSAVER) ==========
+    - id: page_info
+      scrollbar_mode: "off"
+      width: ${disp_w}
+      height: ${disp_h}
+      bg_color: 0x000000
+      widgets:
+        # Background button to wake up (uses script debounce to filter ghost touches)
+        - button:
+            x: 0
+            y: 0
+            width: ${disp_w}
+            height: ${disp_h}
+            bg_opa: TRANSP
+            border_width: 0
+            on_press:
+              - script.execute: screensaver_wake
+            on_release:
+              - script.stop: screensaver_wake
+
+        # --- TOP SECTION (WEATHER + CLOCK centered as group) ---
+        # Weather Icon (large, vertically centered with time+date)
+        - label:
+            id: lbl_weather_icon
+            x: ${info_group_x}
+            y: ${info_weather_y}
+            text: "\U000F0599"
+            text_font: mdi_weather
+            text_color: color_yellow
+            bg_opa: TRANSP
+        
+        # Time (positioned right of weather, centered in box)
+        - label:
+            id: lbl_info_time
+            x: !lambda 'return ${info_group_x} + ${info_clock_offset};'
+            y: ${info_clock_y}
+            width: 180
+            text: "--:--"
+            text_font: font_info_clock
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+          
+        # Date (centered below time, same width)
+        - label:
+            id: lbl_info_date
+            x: !lambda 'return ${info_group_x} + ${info_clock_offset};'
+            y: ${info_date_y}
+            width: 180
+            text: "---"
+            text_font: font_info_date
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
+        # --- MIDDLE SECTION (ALARM - hidden if undefined) ---
+        - label:
+            id: lbl_info_alarm
+            x: 0
+            y: ${info_alarm_y}
+            width: ${disp_w}
+            text: "\U000F0020  --:--"
+            text_font: font_info_alarm
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+            hidden: true
+
+        # --- BOTTOM SECTION (SENSOR - always centered) ---
+        # Combined icon + value + unit, full-width centered
+        - label:
+            id: lbl_info_sensor
+            x: 0
+            y: ${info_sensor_y}
+            width: ${disp_w}
+            text: "\U000F050F  --- "
+            text_font: font_info_sensor
+            text_align: CENTER
+            text_color: color_white
+            bg_opa: TRANSP
+
 # ============================================
 # Helpers
 # ============================================
@@ -1959,30 +2176,167 @@ interval:
           id: lbl_temp_light_name
           text: !lambda 'return id(selected_light_name);'
 
-# Screen timeout - dim after 30s, turn off after 60s
+  # Info Screen Cycle
+  - interval: ${info_cycle_interval}
+    then:
+      - if:
+          condition:
+            lambda: 'return lv_scr_act() == id(page_info)->obj;'
+          then:
+            - lambda: |-
+                // Increment mode
+                int current_mode = id(info_mode);
+                int next_mode = current_mode;
+                
+                // Try to find next valid sensor (max 5 attempts)
+                // Mode 0 = Clock only (initial), 1-5 = Sensors
+                // If mode 0, go to 1.
+                if (next_mode == 0) next_mode = 0; // Start at 0? No, 1.
+
+                for(int i=0; i<6; i++) {
+                  next_mode++;
+                  if (next_mode > 5) next_mode = 1;
+                  
+                  bool valid = false;
+                  if (next_mode == 1 && id(ha_info_1).has_state()) valid = true;
+                  else if (next_mode == 2 && id(ha_info_2).has_state()) valid = true;
+                  else if (next_mode == 3 && id(ha_info_3).has_state()) valid = true;
+                  else if (next_mode == 4 && id(ha_info_4).has_state()) valid = true;
+                  else if (next_mode == 5 && id(ha_info_5).has_state()) valid = true;
+                  
+                  if (valid) {
+                    id(info_mode) = next_mode;
+                    break;
+                  }
+                }
+                
+                // Update UI based on new mode
+                int m = id(info_mode);
+                std::string icon = "";
+                std::string unit = "";
+                std::string value = "--";
+                
+                if (m == 1) { icon = "${info_sensor_1_icon}"; unit = "${info_sensor_1_unit}"; value = id(ha_info_1).state; }
+                else if (m == 2) { icon = "${info_sensor_2_icon}"; unit = "${info_sensor_2_unit}"; value = id(ha_info_2).state; }
+                else if (m == 3) { icon = "${info_sensor_3_icon}"; unit = "${info_sensor_3_unit}"; value = id(ha_info_3).state; }
+                else if (m == 4) { icon = "${info_sensor_4_icon}"; unit = "${info_sensor_4_unit}"; value = id(ha_info_4).state; }
+                else if (m == 5) { icon = "${info_sensor_5_icon}"; unit = "${info_sensor_5_unit}"; value = id(ha_info_5).state; }
+                
+                // Round value to 2 decimal places (if numeric)
+                if (value != "--" && !value.empty()) {
+                  char* endptr;
+                  float fval = strtof(value.c_str(), &endptr);
+                  // Only format if entire string was parsed as a number
+                  if (*endptr == '\0' || *endptr == ' ') {
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "%.2f", fval);
+                    value = buf;
+                    // Remove trailing zeros (20.00 -> 20, 20.50 -> 20.5)
+                    size_t dot = value.find('.');
+                    if (dot != std::string::npos) {
+                      while (value.size() > dot + 1 && value.back() == '0') value.pop_back();
+                      if (value.back() == '.') value.pop_back();
+                    }
+                  }
+                }
+                
+                // Update combined sensor label (icon + value + unit)
+                std::string combined = icon + "  " + value;
+                if (!unit.empty()) combined += " " + unit;
+                lv_label_set_text(id(lbl_info_sensor), combined.c_str());
+
+  # Update Info Screen Clock/Date and Weather
   - interval: 1s
     then:
       - if:
           condition:
-            # Also reset timer if keep_awake entity is ON
-            - binary_sensor.is_off: ha_keep_awake
-            - lvgl.is_idle:
-                timeout: 60s
+            lambda: 'return lv_scr_act() == id(page_info)->obj;'
           then:
-            - light.turn_off: backlight
-          else:
+            - lvgl.label.update:
+                id: lbl_info_time
+                text: !lambda 'return id(esptime).now().strftime("%H:%M");'
+            - lvgl.label.update:
+                id: lbl_info_date
+                text: !lambda 'return id(esptime).now().strftime("%a %d %b");'
+            # Update weather icon and color
+            - lambda: |-
+                if (!id(ha_weather).has_state()) return;
+                std::string state = id(ha_weather).state;
+                const char* icon = "\U000F0599";  // sunny default
+                uint32_t color = 0xFFEB3B;  // yellow default
+                
+                if (state == "sunny") { icon = "\U000F0599"; color = 0xFFEB3B; }
+                else if (state == "clear-night") { icon = "\U000F0594"; color = 0x3F51B5; }
+                else if (state == "cloudy") { icon = "\U000F0590"; color = 0x9E9E9E; }
+                else if (state == "partlycloudy") { icon = "\U000F0595"; color = 0x03A9F4; }
+                else if (state == "rainy") { icon = "\U000F0597"; color = 0x2196F3; }
+                else if (state == "pouring") { icon = "\U000F0596"; color = 0x1565C0; }
+                else if (state == "snowy") { icon = "\U000F0598"; color = 0xFFFFFF; }
+                else if (state == "snowy-rainy") { icon = "\U000F067F"; color = 0x81D4FA; }
+                else if (state == "fog") { icon = "\U000F0591"; color = 0x9E9E9E; }
+                else if (state == "hail") { icon = "\U000F0592"; color = 0x00BCD4; }
+                else if (state == "lightning") { icon = "\U000F0593"; color = 0xFFEB3B; }
+                else if (state == "lightning-rainy") { icon = "\U000F067E"; color = 0xFFEB3B; }
+                else if (state == "windy") { icon = "\U000F059D"; color = 0x009688; }
+                else if (state == "windy-variant") { icon = "\U000F059E"; color = 0x009688; }
+                else if (state == "exceptional") { icon = "\U000F0026"; color = 0xF44336; }
+                
+                lv_label_set_text(id(lbl_weather_icon), icon);
+                lv_obj_set_style_text_color(id(lbl_weather_icon), lv_color_hex(color), LV_PART_MAIN);
+                
+                // Update alarm display (show only if valid)
+                if (id(ha_alarm).has_state()) {
+                  std::string alarm_state = id(ha_alarm).state;
+                  bool valid = !alarm_state.empty() && 
+                               alarm_state != "unavailable" && 
+                               alarm_state != "unknown" &&
+                               alarm_state != "undefined" &&
+                               alarm_state != "None";
+                  if (valid) {
+                    std::string alarm_text = "\U000F0020  " + alarm_state;  // alarm icon + time
+                    lv_label_set_text(id(lbl_info_alarm), alarm_text.c_str());
+                    lv_obj_clear_flag(id(lbl_info_alarm), LV_OBJ_FLAG_HIDDEN);
+                  } else {
+                    lv_obj_add_flag(id(lbl_info_alarm), LV_OBJ_FLAG_HIDDEN);
+                  }
+                } else {
+                  lv_obj_add_flag(id(lbl_info_alarm), LV_OBJ_FLAG_HIDDEN);
+                }
+
+  # Screen timeout and Screensaver logic
+  - interval: 1s
+    then:
+      # 1. Screensaver Activation (Independent of power saving)
+      - if:
+          condition:
+            - lvgl.is_idle:
+                timeout: ${screensaver_timeout}
+            - lambda: 'return lv_scr_act() != id(page_info)->obj;'
+          then:
+            - lvgl.page.show: page_info
+            - light.turn_on:
+                id: backlight
+                brightness: 100%
+
+      # 2. Power Saving (Dim/Off) - Respected only if Keep Awake is OFF
+      - if:
+          condition:
+            - binary_sensor.is_off: ha_keep_awake
+          then:
             - if:
                 condition:
-                  - binary_sensor.is_off: light_mrc_lights_state
                   - lvgl.is_idle:
-                      timeout: 30s
-                  - lambda: 'return id(backlight).current_values.get_brightness() > 0.31f;'
+                      timeout: 60s
                 then:
-                  - light.turn_on:
-                      id: backlight
-                      brightness: 30%
-
-esp32_ble_tracker:
-
-bluetooth_proxy:
-  active: true
+                  - light.turn_off: backlight
+                else:
+                  # Dimming check (30s)
+                  - if:
+                      condition:
+                        - lvgl.is_idle:
+                            timeout: 30s
+                        - lambda: 'return id(backlight).current_values.get_brightness() > 0.31f;'
+                      then:
+                        - light.turn_on:
+                            id: backlight
+                            brightness: 30%

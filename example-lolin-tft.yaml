@@ -98,11 +98,39 @@ substitutions:
   scene_3_bg_color: "0x4CAF50"
   scene_3_text_color: "0xFFFFFF"
   
-  scene_4: script.example_4
-  scene_4_label: "\U000F0502 Scene 4"
   scene_4_bg_color: "0x3F51B5"
   scene_4_text_color: "0xFFFFFF"
 
+  # ==========================
+  # INFO SCREEN (SCREENSAVER)
+  # ==========================
+  screensaver_timeout: "20s"
+  info_cycle_interval: "5s"
+  
+  # Slot 1: Temperature
+  info_sensor_1: sensor.example_temp
+  info_sensor_1_icon: "\U000F050F" # mdi:thermometer
+  info_sensor_1_unit: "°C"
+  
+  # Slot 2: Humidity
+  info_sensor_2: sensor.example_hum
+  info_sensor_2_icon: "\U000F058E" # mdi:water-percent
+  info_sensor_2_unit: "%"
+
+  # Slot 3: CO2
+  info_sensor_3: sensor.example_co2
+  info_sensor_3_icon: "\U000F064F" # mdi:molecule-co2
+  info_sensor_3_unit: "ppm"
+  
+  # Slot 4: Empty (tests skipping)
+  info_sensor_4: "sensor.undefined"
+  info_sensor_4_icon: "\U000F05A8"
+  info_sensor_4_unit: ""
+
+  # Slot 5: Empty
+  info_sensor_5: "sensor.undefined"
+  info_sensor_5_icon: "\U000F05A8"
+  info_sensor_5_unit: ""
 packages:
   common_api: !include packages/common/base.yaml
   board: !include packages/boards/lolin-tft-24-touch.yaml
