@@ -216,6 +216,24 @@ binary_sensor:
             lv_obj_set_style_bg_color(id(btn_mrc_lights), lv_color_hex(0x2C3E50), LV_PART_MAIN);
             lv_label_set_text(id(lbl_btn_mrc_lights), "${icon_main_3}");
           }
+
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_main_all}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_1_state
+    entity_id: ${light_1}
+    internal: true
+    on_state:
+      - lambda: |-
           // Update lights page button
           if (x) {
             lv_obj_add_state(id(btn_light_lava), LV_STATE_CHECKED);
@@ -227,7 +245,34 @@ binary_sensor:
             lv_label_set_text(id(lbl_light_lava), "\U000F0335");
           }
           // Update color/temp page switch if this light is selected
-          if (id(selected_light_entity) == "${light_main_all}") {
+          if (id(selected_light_entity) == "${light_1}") {
+            if (x) {
+              lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            } else {
+              lv_obj_clear_state(id(sw_light_power), LV_STATE_CHECKED);
+              lv_obj_clear_state(id(sw_temp_light_power), LV_STATE_CHECKED);
+            }
+          }
+
+  - platform: homeassistant
+    id: light_2_state
+    entity_id: ${light_2}
+    internal: true
+    on_state:
+      - lambda: |-
+          // Update lights page button
+          if (x) {
+            lv_obj_add_state(id(btn_light_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_letto), lv_color_hex(0xFFC107), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_letto), "\U000F06E8");
+          } else {
+            lv_obj_clear_state(id(btn_light_letto), LV_STATE_CHECKED);
+            lv_obj_set_style_bg_color(id(btn_light_letto), lv_color_hex(0x2C3E50), LV_PART_MAIN);
+            lv_label_set_text(id(lbl_light_letto), "\U000F0335");
+          }
+          // Update color/temp page switch if this light is selected
+          if (id(selected_light_entity) == "${light_2}") {
             if (x) {
               lv_obj_add_state(id(sw_light_power), LV_STATE_CHECKED);
               lv_obj_add_state(id(sw_temp_light_power), LV_STATE_CHECKED);
@@ -1299,10 +1344,10 @@ lvgl:
 
         # Next/Back button (context-dependent)
         - button:
-            x: 350
-            y: 170
-            width: 100
-            height: 80
+            x: ${light_col_4_x}
+            y: ${light_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_btn_h}
             radius: 10
             border_width: 0
             bg_color: color_dark_bg
@@ -1333,11 +1378,10 @@ lvgl:
 
         # Home button
         - button:
-            x: 350
-            y: 260
-            width: 100
-            height: 50
-            radius: 25
+            x: ${nav_next_x}
+            y: ${nav_home_y}
+            width: ${nav_btn_w}
+            height: ${nav_btn_home_h}
             border_width: 0
             bg_color: 0xD32F2F
             widgets:
@@ -1543,22 +1587,22 @@ lvgl:
                   id(selected_light_name) = "${light_12_name}";
               - lvgl.page.show: page_color
         - label:
-            x: 20
-            y: 253
-            width: 100
-            height: 25
+            x: ${light_col_1_x}
+            y: ${light_lbl_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_lbl_h}
             text: "${light_12_name}"
-            text_font: font_16
+            text_font: ${f_text}
             text_align: CENTER
             text_color: color_white
             bg_opa: TRANSP
 
         - button:
             id: btn_light_13
-            x: 130
-            y: 170
-            width: 100
-            height: 80
+            x: ${light_col_2_x}
+            y: ${light_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_btn_h}
             radius: 10
             border_width: 0
             bg_color: color_dark_bg
@@ -1567,7 +1611,7 @@ lvgl:
               - label:
                   id: lbl_light_13
                   align: CENTER
-                  text_font: mdi_32
+                  text_font: ${f_icon}
                   text: "\U000F0335"
             on_short_click:
               - homeassistant.service:
@@ -1580,22 +1624,22 @@ lvgl:
                   id(selected_light_name) = "${light_13_name}";
               - lvgl.page.show: page_color
         - label:
-            x: 130
-            y: 253
-            width: 100
-            height: 25
+            x: ${light_col_2_x}
+            y: ${light_lbl_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_lbl_h}
             text: "${light_13_name}"
-            text_font: font_16
+            text_font: ${f_text}
             text_align: CENTER
             text_color: color_white
             bg_opa: TRANSP
 
         - button:
             id: btn_light_14
-            x: 240
-            y: 170
-            width: 100
-            height: 80
+            x: ${light_col_3_x}
+            y: ${light_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_btn_h}
             radius: 10
             border_width: 0
             bg_color: color_dark_bg
@@ -1604,7 +1648,7 @@ lvgl:
               - label:
                   id: lbl_light_14
                   align: CENTER
-                  text_font: mdi_32
+                  text_font: ${f_icon}
                   text: "\U000F0335"
             on_short_click:
               - homeassistant.service:
@@ -1617,22 +1661,22 @@ lvgl:
                   id(selected_light_name) = "${light_14_name}";
               - lvgl.page.show: page_color
         - label:
-            x: 240
-            y: 253
-            width: 100
-            height: 25
+            x: ${light_col_3_x}
+            y: ${light_lbl_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_lbl_h}
             text: "${light_14_name}"
-            text_font: font_16
+            text_font: ${f_text}
             text_align: CENTER
             text_color: color_white
             bg_opa: TRANSP
 
         # Back button (to lights page 1 or scenes or main)
         - button:
-            x: 350
-            y: 170
-            width: 100
-            height: 80
+            x: ${light_col_4_x}
+            y: ${light_row_2_y}
+            width: ${light_btn_w}
+            height: ${light_btn_h}
             radius: 10
             border_width: 0
             bg_color: color_dark_bg
@@ -1658,11 +1702,10 @@ lvgl:
 
         # Home button
         - button:
-            x: 350
-            y: 260
-            width: 100
-            height: 50
-            radius: 25
+            x: ${nav_next_x}
+            y: ${nav_home_y}
+            width: ${nav_btn_w}
+            height: ${nav_btn_home_h}
             border_width: 0
             bg_color: 0xD32F2F
             widgets:

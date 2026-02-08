@@ -76,13 +76,12 @@ substitutions:
   
   # Navigation Buttons
   nav_btn_w: "70"
-  nav_btn_h: "50"
-  nav_btn_home_h: "40"
+  nav_btn_h: "45"  # Increased slightly
+  nav_btn_home_h: "45"
   nav_back_x: "10"
-  nav_next_x: "240"
-  nav_row_y: "180"
-  nav_home_y: "190" # Wait, overlap? In scenes page back/next are at 180. Home is usually bottom right.
-  # In 320x240 scenes page, back/next are at 180.
+  nav_next_x: "235" # Safer margin
+  nav_row_y: "185" # Moved up
+  nav_home_y: "185" # Aligned with other nav buttons
   
   # Lights Page Grid (4 cols, 2 rows)
   light_btn_w: "60"
@@ -92,11 +91,11 @@ substitutions:
   light_col_2_x: "90"
   light_col_3_x: "170"
   light_col_4_x: "250"
-  light_row_1_y: "45"
-  light_row_2_y: "125"
-  light_lbl_offset: "55" # 100 - 45
-  light_lbl_row_1_y: "100"
-  light_lbl_row_2_y: "180"
+  light_row_1_y: "30"  # Moved up closer to top bar
+  light_row_2_y: "110" # Moved up
+  light_lbl_offset: "52" # Closer to button
+  light_lbl_row_1_y: "82"  # 30 + 52
+  light_lbl_row_2_y: "162" # 110 + 52
 
   # Color Page
   color_lbl_name_x: "60"

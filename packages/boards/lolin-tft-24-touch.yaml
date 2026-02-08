@@ -45,6 +45,8 @@ display:
     data_rate: 40MHz
     transform:
       swap_xy: true
+      mirror_x: true
+      mirror_y: true
     dimensions:
       width: 320
       height: 240
@@ -66,7 +68,8 @@ touchscreen:
       y_max: 3850
     transform:
       swap_xy: true
-      mirror_x: true
+      mirror_x: false 
+      mirror_y: true
     on_touch:
       - light.turn_on:
           id: backlight
