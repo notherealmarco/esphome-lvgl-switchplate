@@ -73,18 +73,6 @@ globals:
   - id: info_mode
     type: int
     initial_value: "1"
-  
-# Script for debounced screensaver wake (filters ghost touches)
-script:
-  - id: screensaver_wake
-    mode: restart
-    then:
-      - delay: 200ms
-      - lvgl.page.show: page_main
-      - light.turn_on:
-          id: backlight
-          brightness: 100%
-      - lambda: 'lv_disp_trig_activity(NULL);'
 
 # Text sensors from Home Assistant
 text_sensor:
@@ -2082,10 +2070,10 @@ lvgl:
             height: ${disp_h}
             bg_opa: TRANSP
             border_width: 0
+            shadow_width: 0
+            radius: 0
             on_press:
-              - script.execute: screensaver_wake
-            on_release:
-              - script.stop: screensaver_wake
+              - lvgl.page.show: page_main
 
         # --- TOP SECTION (WEATHER + CLOCK centered as group) ---
         # Weather Icon (large, vertically centered with time+date)
@@ -2151,6 +2139,26 @@ lvgl:
 # ============================================
 # Helpers
 # ============================================
+
+number:
+  - platform: template
+    name: "AOD Brightness"
+    id: aod_brightness
+    optimistic: true
+    min_value: 0
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    restore_value: true
+    initial_value: 10
+    icon: "mdi:brightness-6"
+
+switch:
+  - platform: template
+    name: "Always On Display"
+    id: aod_mode
+    optimistic: true
+    icon: "mdi:monitor-eye"
 
 button:
   - platform: template
@@ -2371,7 +2379,16 @@ interval:
                   - lvgl.is_idle:
                       timeout: 60s
                 then:
-                  - light.turn_off: backlight
+                  - if:
+                      condition:
+                        - switch.is_on: aod_mode
+                      then:
+                        - light.turn_on:
+                            id: backlight
+                            brightness: !lambda 'return id(aod_brightness).state / 100.0;'
+                      else:
+                        - lvgl.page.show: page_main
+                        - light.turn_off: backlight
                 else:
                   # Dimming check (30s)
                   - if:
