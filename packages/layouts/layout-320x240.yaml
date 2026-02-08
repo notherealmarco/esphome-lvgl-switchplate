@@ -1,0 +1,123 @@
+substitutions:
+  # Screen Dimensions
+  disp_w: "320"
+  disp_h: "240"
+
+  # Font Sizes
+  font_s_size: "12"   # font_16
+  font_m_size: "16"   # font_24
+  font_l_size: "20"   # font_32 (base)
+  font_xl_size: "32"  # font_48
+  icon_s_size: "12"   # not used?
+  icon_m_size: "16"   # mdi_32 ? No, mdi_32 was 24. 
+  # Wait, mdi_32 in 480x320 was size 32 (glyphs) + size 24 (base) ?. No, let's check ui.yaml.
+  # ui.yaml: mdi_32 size: 32. But wait, I recall 24.
+  # Let's check ui.yaml again. Line 507: id: mdi_32, size: 32.
+  # So in 320x240, mdi_32 should be 24.
+
+  # Font References
+  f_text: "font_16"
+  f_title: "font_24"
+  f_large: "font_32"
+  f_huge: "font_48"
+  f_icon: "mdi_32" # This ID will have different size property
+
+  # Top Bar
+  top_h: "30"
+  
+  # Main Page Layout
+  # Buttons: 260-> ?
+  # Original: 260, 60. Target: 180, 45 (approx)
+  # 320 - 95 - 10 = 215.
+  # Target layout for Main Page 320x240:
+  # 2 cols of buttons + tall button?
+  # Or adjust positions.
+  # Let's assume:
+  # Col 1: 170
+  # Col 2: 245
+  # Row 1: 45
+  # Row 2: 120
+  # Btn Size: 65x60
+  # Tall Btn: 65x135
+  
+  main_btn_w: "70"
+  main_btn_h: "60"
+  main_btn_all_w: "70"
+  main_btn_all_h: "130"
+  main_col_1_x: "170"
+  main_col_2_x: "245"
+  main_row_1_y: "45"
+  main_row_2_y: "115"
+  
+  # CO2 Arc
+  co2_arc_x: "10"
+  co2_arc_y: "40"
+  co2_arc_w: "140"
+  co2_arc_h: "140"
+  co2_lbl_val_y: "90"
+  co2_lbl_unit_y: "130"
+  
+  # Settings Button
+  btn_set_x: "170"
+  btn_set_y: "190"
+  btn_set_w: "145" # Fits 170+145 = 315
+  btn_set_h: "45"
+  btn_set_rad: "20"
+
+  # Scenes Page Layout
+  # 2x2 Grid
+  scene_btn_w: "145"
+  scene_btn_h: "55"
+  scene_col_1_x: "10"
+  scene_col_2_x: "165"
+  scene_row_1_y: "40"
+  scene_row_2_y: "105"
+  
+  # Navigation Buttons
+  nav_btn_w: "70"
+  nav_btn_h: "50"
+  nav_btn_home_h: "40"
+  nav_back_x: "10"
+  nav_next_x: "240"
+  nav_row_y: "180"
+  nav_home_y: "190" # Wait, overlap? In scenes page back/next are at 180. Home is usually bottom right.
+  # In 320x240 scenes page, back/next are at 180.
+  
+  # Lights Page Grid (4 cols, 2 rows)
+  light_btn_w: "60"
+  light_btn_h: "50"
+  light_lbl_h: "20"
+  light_col_1_x: "10"
+  light_col_2_x: "90"
+  light_col_3_x: "170"
+  light_col_4_x: "250"
+  light_row_1_y: "45"
+  light_row_2_y: "125"
+  light_lbl_offset: "55" # 100 - 45
+  light_lbl_row_1_y: "100"
+  light_lbl_row_2_y: "180"
+
+  # Color Page
+  color_lbl_name_x: "60"
+  color_lbl_name_y: "10"
+  color_lbl_name_w: "200"
+  color_sw_x: "10"
+  color_sw_y: "10"
+  color_sw_w: "40"
+  color_grad_y: "65"
+  color_grad_h: "25"
+  color_slider_hue_y: "65"
+  color_bar_x1: "20"
+  color_bar_w1: "93"
+  color_bar_x2: "113"
+  color_bar_w2: "94"
+  color_bar_x3: "207"
+  color_bar_w3: "93"
+  color_sat_y: "120"
+  color_bri_y: "170"
+  color_btn_back_x: "230"
+  color_btn_back_y: "170"
+  color_btn_mode_x: "275"
+  color_lbl_width: "280"
+  color_slider_w: "280"
+  color_sat_lbl_y: "95"

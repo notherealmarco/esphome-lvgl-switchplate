@@ -1,0 +1,73 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  min_version: 2024.6.0
+  name_add_mac_suffix: false
+  project:
+    name: "lolin-tft-24-touch.esphome"
+    version: "1.0"
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: esp-idf
+
+# SPI bus for display and touchscreen (shared)
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+# Backlight control
+output:
+  - platform: ledc
+    pin: GPIO22
+    id: backlight_pwm
+
+light:
+  - platform: monochromatic
+    output: backlight_pwm
+    name: "Backlight"
+    id: backlight
+    restore_mode: ALWAYS_ON
+    default_transition_length: 0s
+
+# Display - ILI9341 320x240 (landscape mode)
+display:
+  - platform: ili9xxx
+    model: ILI9341
+    cs_pin: GPIO26
+    dc_pin: GPIO5
+    id: my_display
+    auto_clear_enabled: false
+    update_interval: never
+    invert_colors: false
+    data_rate: 40MHz
+    transform:
+      swap_xy: true
+    dimensions:
+      width: 320
+      height: 240
+      offset_width: 0
+      offset_height: 0
+
+# Touchscreen - XPT2046 (resistive)
+touchscreen:
+  - platform: xpt2046
+    id: my_touchscreen
+    cs_pin: GPIO17
+    display: my_display
+    update_interval: 50ms
+    threshold: 400
+    calibration:
+      x_min: 300
+      x_max: 3850
+      y_min: 350
+      y_max: 3850
+    transform:
+      swap_xy: true
+      mirror_x: true
+    on_touch:
+      - light.turn_on:
+          id: backlight
+          brightness: 100%

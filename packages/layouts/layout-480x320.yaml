@@ -1,0 +1,107 @@
+substitutions:
+  # Screen Dimensions
+  disp_w: "480"
+  disp_h: "320"
+
+  # Font Sizes (used in font definitions)
+  font_s_size: "16"   # font_16
+  font_m_size: "24"   # font_24
+  font_l_size: "20"   # font_32 (base size)
+  font_xl_size: "32"  # font_48
+  icon_s_size: "16"   # not used?
+  icon_m_size: "24"   # mdi_32
+
+  # Font References (used in widgets)
+  # Standard resolutions use larger fonts
+  f_text: "font_16"
+  f_title: "font_24"
+  f_large: "font_32"
+  f_huge: "font_48"
+  f_icon: "mdi_32"
+  f_icon_s: "mdi_32" # fallback if needed
+
+  # Top Bar
+  top_h: "40"
+  
+  # Main Page Layout
+  # Buttons: 260, 60 | 260, 155 | 365, 60
+  main_btn_w: "95"
+  main_btn_h: "85"
+  main_btn_all_w: "95"
+  main_btn_all_h: "180"
+  main_col_1_x: "260"
+  main_col_2_x: "365"
+  main_row_1_y: "60"
+  main_row_2_y: "155"
+  
+  # CO2 Arc
+  co2_arc_x: "20"
+  co2_arc_y: "50"
+  co2_arc_w: "200"
+  co2_arc_h: "200"
+  co2_lbl_val_y: "120"
+  co2_lbl_unit_y: "175"
+  
+  # Settings Button
+  btn_set_x: "260"
+  btn_set_y: "250"
+  btn_set_w: "200"
+  btn_set_h: "60"
+  btn_set_rad: "30"
+
+  # Scenes Page Layout
+  # 2x2 Grid
+  scene_btn_w: "200"
+  scene_btn_h: "75"
+  scene_col_1_x: "30"
+  scene_col_2_x: "250"
+  scene_row_1_y: "40"
+  scene_row_2_y: "135"
+  
+  # Navigation Buttons (Next/Back/Home)
+  nav_btn_w: "100"
+  nav_btn_h: "80"
+  nav_btn_home_h: "50"
+  nav_back_x: "30"
+  nav_next_x: "350"
+  nav_row_y: "230"
+  nav_home_y: "260"
+
+  # Lights Page Grid (4 cols, 2 rows)
+  light_btn_w: "100"
+  light_btn_h: "80"
+  light_lbl_h: "25"
+  light_col_1_x: "20"
+  light_col_2_x: "130"
+  light_col_3_x: "240"
+  light_col_4_x: "350"
+  light_row_1_y: "55"
+  light_row_2_y: "170"
+  light_lbl_offset: "83" # 138 - 55
+  light_lbl_row_1_y: "138"
+  light_lbl_row_2_y: "253"
+
+  # Color Page
+  color_lbl_name_x: "100"
+  color_lbl_name_y: "15"
+  color_lbl_name_w: "280"
+  color_sw_x: "20"
+  color_sw_y: "15"
+  color_sw_w: "60"
+  color_grad_y: "95"
+  color_grad_h: "40"
+  color_slider_hue_y: "95"
+  color_bar_x1: "40"
+  color_bar_w1: "134"
+  color_bar_x2: "174"
+  color_bar_w2: "132"
+  color_bar_x3: "306"
+  color_bar_w3: "134"
+  color_sat_y: "180"
+  color_bri_y: "250"
+  color_btn_back_x: "340"
+  color_btn_back_y: "245"
+  color_btn_mode_x: "410"
+  color_lbl_width: "440"
+  color_slider_w: "400"
+  color_sat_lbl_y: "145"
