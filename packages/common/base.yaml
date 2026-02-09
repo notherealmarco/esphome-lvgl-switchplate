@@ -1,6 +1,7 @@
 substitutions:
   api_key: ""
   ota_password: ""
+  timezone: "Europe/Rome"
 
 # Enable logging
 logger:
@@ -25,4 +26,5 @@ wifi:
 
 time:
   - platform: homeassistant
+    timezone: ${timezone}
     id: esptime
