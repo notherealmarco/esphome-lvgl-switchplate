@@ -1,3 +1,6 @@
+substitutions:
+  display_rotation: 270
+
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
@@ -63,7 +66,6 @@ display:
     id: my_display
     spi_id: spi_display
     auto_clear_enabled: false
-    rotation: 270
     reset_pin: 4
     dc_pin:
       number: 0

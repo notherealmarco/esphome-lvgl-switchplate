@@ -717,6 +717,7 @@ color:
 lvgl:
   displays:
     - my_display
+  rotation: ${display_rotation}
   touchscreens:
     - my_touchscreen
   color_depth: 16
