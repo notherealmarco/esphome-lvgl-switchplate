@@ -7,7 +7,7 @@ substitutions:
   font_s_size: "16"   # font_16
   font_m_size: "24"   # font_24
   font_l_size: "20"   # font_32 (base size)
-  font_xl_size: "32"  # font_48
+  font_xl_size: "48"  # font_48
   icon_s_size: "16"   # not used?
   icon_m_size: "24"   # mdi_32
 
@@ -108,25 +108,27 @@ substitutions:
   color_sat_lbl_y: "145"
 
   # Info/Screensaver Page Layout (480x320)
-  # Font Sizes
-  info_weather_size: "140"
-  info_clock_size: "90"
-  info_date_size: "40"
-  info_sensor_icon_size: "54"
-  info_sensor_text_size: "48"
-  info_alarm_size: "32"
+  # Font Sizes (scaled 1.5x from 320x240)
+  info_weather_size: "135"      # 90 * 1.5
+  info_clock_size: "84"         # 56 * 1.5
+  info_date_size: "36"          # 24 * 1.5
+  info_sensor_icon_size: "48"   # 32 * 1.5
+  info_sensor_text_size: "39"   # 26 * 1.5
+  info_alarm_size: "30"         # 20 * 1.5
 
   # Top section: Weather icon + Time/Date, vertically centered on screen
-  info_group_x: "30"
-  info_clock_offset: "150"
-  info_weather_y: "40"
-  info_clock_y: "45"
-  info_date_y: "135"
+  info_group_x: "45"            # 30 * 1.5
+  info_clock_offset: "135"      # 90 * 1.5
+  info_clock_width: "250"        # Width of clock label (HH:mm) - wider for larger font
+  info_date_width: "250"         # Width of date label
+  info_weather_y: "37"          # 25 * 1.5 (rounded)
+  info_clock_y: "45"            # 30 * 1.5
+  info_date_y: "127"            # 85 * 1.5 (rounded)
   
   # Alarm section (between weather/clock and sensor)
-  info_alarm_y: "190"
+  info_alarm_y: "195"           # 130 * 1.5
   
   # Sensor section
-  info_sensor_y: "260"
+  info_sensor_y: "250"          # 185 * 1.5 (rounded)
 
 

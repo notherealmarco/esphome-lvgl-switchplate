@@ -1,0 +1,103 @@
+substitutions:
+  update_interval: 10s
+
+esphome:
+  name: garage
+
+esp8266:
+  board: esp8285
+
+# ── AP-only mode: no station credentials, device is always a hotspot ──
+wifi:
+  ap:
+    ssid: "switchando-garage-sonoff"
+    password: "charge1234"
+
+# Redirects any HTTP request on the AP to the device's own web UI
+# captive_portal:
+
+# Built-in web UI: shows all sensors + relay toggle at http://192.168.4.1
+web_server:
+  port: 80
+  local: true
+
+# No HA API needed
+# api: removed
+
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: RX
+  baud_rate: 4800
+  parity: EVEN
+
+
+ota:
+- platform: esphome
+  password: 'serafina'
+
+# ── Relay: always off on boot (safe after power failure) ──
+switch:
+  - platform: gpio
+    name: "Charger Relay"
+    pin: GPIO12
+    id: relay
+    restore_mode: ALWAYS_OFF
+
+# ── Button: triggers the 4h charge script ──
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "Charge Button"
+    on_press:
+      then:
+        - script.execute: charge_timer
+
+# ── Core logic: turn on, wait 4h, turn off ──
+script:
+  - id: charge_timer
+    mode: restart   # pressing again RESETS the 4h countdown; change to 'single' to ignore presses mid-charge
+    then:
+      - switch.turn_on: relay
+      - delay: 8h
+      - switch.turn_off: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
+
+sensor:
+  - platform: cse7766
+    voltage:
+      name: "Sonoff Pow R2 Voltage"
+      filters:
+        - throttle_average: ${update_interval}
+    current:
+      name: "Sonoff Pow R2 Current"
+      filters:
+        - throttle_average: ${update_interval}
+    power:
+      name: "Sonoff Pow R2 Power"
+      filters:
+        - throttle_average: ${update_interval}
+    energy:
+      name: "Sonoff Pow R2 Energy"
+      filters:
+        - throttle: ${update_interval}
+    apparent_power:
+      name: "Sonoff Pow R2 Apparent Power"
+      filters:
+        - throttle_average: ${update_interval}
+    reactive_power:
+      name: "Sonoff Pow R2 Reactive Power"
+      filters:
+        - throttle_average: ${update_interval}
+    power_factor:
+      name: "Sonoff Pow R2 Power Factor"
+      filters:
+        - throttle_average: ${update_interval}

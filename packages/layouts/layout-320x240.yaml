@@ -134,6 +134,8 @@ substitutions:
   # Top section: Weather icon + Time/Date, vertically centered on screen
   info_group_x: "30"
   info_clock_offset: "90"
+  info_clock_width: "180"       # Width of clock label (HH:mm)
+  info_date_width: "180"        # Width of date label
   info_weather_y: "25"       # Aligned with time+date block
   info_clock_y: "30"         # Pushed down for centering
   info_date_y: "85"          # Reduced gap from clock

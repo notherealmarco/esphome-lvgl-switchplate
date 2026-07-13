@@ -2091,7 +2091,7 @@ lvgl:
             id: lbl_info_time
             x: !lambda 'return ${info_group_x} + ${info_clock_offset};'
             y: ${info_clock_y}
-            width: 180
+            width: ${info_clock_width}
             text: "--:--"
             text_font: font_info_clock
             text_align: CENTER
@@ -2103,7 +2103,7 @@ lvgl:
             id: lbl_info_date
             x: !lambda 'return ${info_group_x} + ${info_clock_offset};'
             y: ${info_date_y}
-            width: 180
+            width: ${info_date_width}
             text: "---"
             text_font: font_info_date
             text_align: CENTER

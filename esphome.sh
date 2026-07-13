@@ -27,7 +27,7 @@ done
 shift $((OPTIND - 1))
 
 # Build the docker command
-DOCKER_CMD="docker run --rm --privileged -v \"${PWD}\":/config -it"
+DOCKER_CMD="docker run --rm --privileged -v \"${PWD}\":/config:Z -it"
 
 # Add the device option if specified
 if [ -n "$DEVICE" ]; then
